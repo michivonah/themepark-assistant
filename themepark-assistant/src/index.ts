@@ -1,9 +1,17 @@
 import { Hono } from 'hono'
+import { bearerAuth } from 'hono/bearer-auth'
+import notification from './notification'
+import logbook from './logbook'
 
+// create app
 const app = new Hono()
 
-app.get('/', (c) => {
-  return c.text('Hello Hono!')
-})
+// add bearer authentication
+const token = 'insecure-token'
 
+app.use('/*', bearerAuth({ token }))
+
+// define routes & export app
+app.route('/notification', notification)
+app.route('/logbook', logbook)
 export default app

@@ -1,0 +1,54 @@
+# API structure
+
+## Required endpoints
+- authentication (via GitHub OAuth?)
+    - login
+    - logout
+- list all available themeparks
+- list all attractions per themepark
+- notification
+    - list all configured targets
+    - add webhook target
+    - remove webhook target
+    - enable notifications for target
+    - disable notifications for target
+    - subscribe attraction
+    - unsubscribe attraction
+- logbook
+    - list all entries
+        - option to filter by date (via request parameters)
+        - option to filter by themepark (via request parameters)
+        - or both (via request parameters)
+    - add entry
+    - remove entry
+- user settings
+    - delete account
+
+## Concept
+- /auth -> for authentication purposes
+- /themepark/list -> list all themeparks
+- /themepark/list/attraction -> list all attractions from a themepark
+    - parameters: themepark
+- /attraction
+    - /<ID>/subscribe -> subscribe notifications
+    - /<ID>/unsubscribe -> unsubscribe notifications
+- /notification
+    - /list
+        - parameters: date, themepark
+    - /add-target
+        - parameters: name, url
+    - /remove-target
+        - parmeters: target-id
+    - /enable-notification
+    - /disable-notification
+- /logbook
+    - /list
+        - parameters: date, themepark -> both optional
+    - /add-entry
+        - parameters: attraction, expected-waittime, real-waittime, unix-timestamp
+    - /edit-entry -> optional, if it makes sense
+        - parameters: entry-id, attraction, expected-waittime, real-waittime
+    - /remove-entry
+        - parameters: entry-id
+- /user
+    - /delete-account -> deletes current account & all associated data instantly
