@@ -2,7 +2,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "themepark-assistant",
   "main": "src/index.ts",
-  "compatibility_date": "2025-09-07"
+  "compatibility_date": "2025-09-07",
   // "compatibility_flags": [
   //   "nodejs_compat"
   // ],
@@ -21,13 +21,14 @@
   //     "bucket_name": "my-bucket"
   //   }
   // ],
-  // "d1_databases": [
-  //   {
-  //     "binding": "MY_DB",
-  //     "database_name": "my-database",
-  //     "database_id": ""
-  //   }
-  // ],
+  "d1_databases": [
+    {
+      "binding": "db",
+      "database_name": "themepark-assistant",
+      "database_id": "59680d24-f3c4-4bb6-b856-ad8c2b6bca3f",
+      "migrations_dir": "drizzle/migrations"
+    }
+  ],
   // "ai": {
   //   "binding": "AI"
   // },
