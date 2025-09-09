@@ -23,7 +23,7 @@
   // ],
   "d1_databases": [
     {
-      "binding": "db",
+      "binding": "d1_db",
       "database_name": "themepark-assistant",
       "database_id": "59680d24-f3c4-4bb6-b856-ad8c2b6bca3f",
       "migrations_dir": "drizzle/migrations"
