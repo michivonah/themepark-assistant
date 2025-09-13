@@ -26,6 +26,7 @@
       "binding": "d1_db",
       "database_name": "themepark-assistant",
       "database_id": "59680d24-f3c4-4bb6-b856-ad8c2b6bca3f",
+      "preview_database_id": "03294d21-460e-43aa-8e9e-a2d0221936ca",
       "migrations_dir": "drizzle/migrations"
     }
   ],

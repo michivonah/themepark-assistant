@@ -13,7 +13,7 @@ DB scheme is defined in typescript
 
 apply changes
 ```bash
-npx drizzle-kit push
+npx drizzle-kit push --config=drizzle-dev.config.ts
 ```
 
 ## Cloudflare workers tricks
