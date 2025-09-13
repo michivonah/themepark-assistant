@@ -10,6 +10,9 @@ export default async function cronRouter(
         case '* * * * *':
             console.log('every minute');
             break;
+        case '0 4 7,14,21,28 * *':
+            await updateThemeparkData(env);
+            break;
         default:
             console.log('its me - the cron router');
             break;
