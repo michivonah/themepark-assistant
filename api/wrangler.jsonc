@@ -29,6 +29,12 @@
       "migrations_dir": "drizzle/migrations"
     }
   ],
+  "triggers": {
+    "crons": [
+      "0 4 7,14,21,28 * *", // At 04:00 on day-of-month 7, 14, 21, and 28.
+      "* * * * *" // every minute
+    ]
+  }
   // "ai": {
   //   "binding": "AI"
   // },

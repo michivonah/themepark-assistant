@@ -15,3 +15,25 @@ apply changes
 ```bash
 npx drizzle-kit push
 ```
+
+## Cloudflare workers tricks
+If types are missing, run:
+```bash
+npx wrangler types
+```
+
+## Testing cronjobs
+Run worker locally (without remote d1 access)
+```bash
+npx wrangler dev --test-scheduled
+```
+
+Run worker locally (with remote connection to d1)
+```bash
+npx wrangler dev --remote --test-scheduled
+```
+
+Run curl request with cron expression
+```bash
+curl "http://localhost:8787/__scheduled?cron=*+*+*+*+*"
+```
