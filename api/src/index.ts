@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { bearerAuth } from 'hono/bearer-auth'
-import notification from './notification'
-import logbook from './logbook'
+import notification from './routes/notification'
+import logbook from './routes/logbook'
 import cronRouter from './jobs/cron'
 
 // create app
