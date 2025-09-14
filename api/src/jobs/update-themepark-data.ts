@@ -2,6 +2,7 @@ import { getDbEnv } from '../db/client'
 import { themepark } from '../db/schema'
 import { countryCodesDE } from '../lib/countries'
 import fetchData from '../lib/fetch-data'
+import asyncBatchJob from '../lib/async-batch-job'
 
 interface Park {
     id: string,
@@ -9,42 +10,58 @@ interface Park {
     land: string
 }
 
-export async function updateThemeparkData(env: Env): Promise<void>{
+/**
+ * Fetches a list of available themeparks from an external API
+ * @param endpoint Endpoint where to fetch data from (default: https://api.wartezeiten.app/v1/parks)
+ * @param lang Language specified in the request's header (default: de)
+ * @returns Object with all themeparks
+ */
+async function fetchThemeparks(
+    endpoint: string = "https://api.wartezeiten.app/v1/parks",
+    lang: string = "de"
+): Promise<Park[]>{
     try{
-        // fetch all available themeparks from external API
-        const endpoint = "https://api.wartezeiten.app/v1/parks"
         const headers = {
-            'language':'de'
+            'language':lang
         }
-        const availableThemeparks = await fetchData<Park[]>(endpoint, headers);
+        const result = await fetchData<Park[]>(endpoint, headers);
+        return result;
+    }
+    catch(e){
+        throw new Error(`Fetching themeparks failed: ${e}`);
+    }
+}
 
-        // internal db queries
+/**
+ * Loads themeparks from API and compare to current themeparks in DB.
+ * Adds the missing themeparks to the DB in multiple batches
+ * @param env DB Connection
+ */
+export async function updateThemeparkData(env: Env): Promise<void>{
+    const availableThemeparks = await fetchThemeparks();
+
+    try{
+        // get current list of themeparks from DB
         const db = getDbEnv(env);
         const currentThemeparks = await db.select({
             apiName: themepark.apiName
         }).from(themepark);
 
-        let newParks = [];
-
-        for (let park of availableThemeparks){
-            if(currentThemeparks.length == 0 || !currentThemeparks.some(id => id.apiName == park.id)){ // checks if id already exists in db
-                newParks.push({
-                    name: park.name,
-                    apiName: park.id,
-                    countrycode: countryCodesDE[park.land]
-                });
-                console.log(`${park.id} is missing in DB`)
-            }
-        }
+        // filter to get only the new parks
+        const newParks = availableThemeparks.filter(
+            park => currentThemeparks.length == 0 || !currentThemeparks.some(id => id.apiName == park.id)
+        ).map(park => ({
+            name: park.name,
+            apiName: park.id,
+            countrycode: countryCodesDE[park.land]
+        }));
 
         // only run queries, when new parks were found
         if (newParks.length != 0){
             // split into multiple batches, to apply with D1's limits
-            const batchSize = 20;
-            for (let i = 0; i < newParks.length; i += batchSize){
-                const batch = newParks.slice(i, i + batchSize);
+            await asyncBatchJob(newParks, 20, async (batch) => {
                 await db.insert(themepark).values(batch);
-            }
+            });
         }
     }
     catch(e){
