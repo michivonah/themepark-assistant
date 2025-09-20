@@ -1,5 +1,6 @@
 // Cron Router
 import { updateThemeparkData } from "./update-themepark-data";
+import { batchAttractionImport } from "./update-attraction-list";
 
 export default async function cronRouter(
     event: ScheduledEvent,
@@ -7,10 +8,13 @@ export default async function cronRouter(
     ctx: ExecutionContext,
 ){
     switch (event.cron){
-        case '* * * * *':
-            console.log('every minute');
+        case '*/5 * * * *':
+            console.log('every 5 minutes');
             break;
-        case '0 4 7,14,21,28 * *':
+        case '0 1-6 7,14,21,28 * *':
+            await batchAttractionImport(env, event.scheduledTime, event.cron);
+            break;
+        case '0 4 1 * *':
             await updateThemeparkData(env);
             break;
         default:

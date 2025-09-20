@@ -32,7 +32,8 @@
   ],
   "triggers": {
     "crons": [
-      "0 4 7,14,21,28 * *", // At 04:00 on day-of-month 7, 14, 21, and 28.
+      "0 1-6 7,14,21,28 * *", // Each hour from 01:00 to 06:00 on day-of-month 7, 14, 21, and 28. -> update attraction list
+      "0 4 1 * *", // At 04:00 on the 1th of each month -> update themeparks
       "* * * * *" // every minute
     ]
   }
