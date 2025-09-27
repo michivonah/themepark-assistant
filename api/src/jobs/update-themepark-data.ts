@@ -1,7 +1,7 @@
 import { getDbEnv } from '../db/client'
 import { themepark } from '../db/schema'
 import { countryCodesDE } from '../lib/countries'
-import fetchData from '../lib/fetch-data'
+import httpRequest from '../lib/http-request'
 import asyncBatchJob from '../lib/async-batch-job'
 
 interface Park {
@@ -24,7 +24,9 @@ async function fetchThemeparks(
         const headers = {
             'language':lang
         }
-        const result = await fetchData<Park[]>(endpoint, headers);
+        const result = await httpRequest<Park[]>(endpoint, {
+            headers: headers
+        });
         return result;
     }
     catch(e){

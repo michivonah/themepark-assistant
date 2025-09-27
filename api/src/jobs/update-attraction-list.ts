@@ -1,7 +1,7 @@
 import { getDbEnv } from '../db/client'
 import { attraction, themepark } from '../db/schema'
 import { inArray } from 'drizzle-orm'
-import fetchData from '../lib/fetch-data'
+import httpRequest from '../lib/http-request'
 import asyncBatchJob from '../lib/async-batch-job'
 
 interface AttractionImport {
@@ -38,7 +38,9 @@ async function fetchAttractions(
             'park':park
         };
 
-        const result = await fetchData<AttractionImport[]>(endpoint, headers);
+        const result = await httpRequest<AttractionImport[]>(endpoint, {
+            headers: headers
+        });
         return result;
     }
     catch(e){
