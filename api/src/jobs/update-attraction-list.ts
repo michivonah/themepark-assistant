@@ -1,62 +1,22 @@
 import { getDbEnv } from '../db/client'
 import { attraction, themepark } from '../db/schema'
 import { inArray } from 'drizzle-orm'
-import httpRequest from '../lib/http-request'
+import { Attraction } from '../types/attraction'
+import { ThemeparkSelect } from '../types/themepark'
 import asyncBatchJob from '../lib/async-batch-job'
+import fetchAttractions from '../lib/fetch-attractions'
 
-interface AttractionImport {
-    code: string,
-    name: string,
-}
-
-interface AttractionType {
-    name: string,
-    apiCode: string,
-    themeparkId: number
-}
-
-interface Themepark {
-    apiName: string,
-    id: number
-}
-
-/**
- * Fetching the attractions from a specified park
- * @param park API Code for request themepark
- * @param endpoint Endpoint where to fetch data from (default: https://api.wartezeiten.app/v1/parks)
- * @param lang Language used for API request
- * @returns Interface with attraction code & name
- */
-async function fetchAttractions(
-    park: string,
-    endpoint: string = "https://api.wartezeiten.app/v1/parks",
-    lang: string = 'de'
-): Promise<AttractionImport[]>{
-    try{
-        const headers = {
-            'language':lang,
-            'park':park
-        };
-
-        const result = await httpRequest<AttractionImport[]>(endpoint, {
-            headers: headers
-        });
-        return result;
-    }
-    catch(e){
-        throw new Error(`Failed to fetch attractions: ${e}`);
-    }
-}
+type ThemeparkAPI = Pick<ThemeparkSelect, "apiName" | "id">;
 
 /**
  * Return an object of all themeparks saved in the database
  * @param env DB Connection
  * @returns Object of themeparks with api name & id from internal DB
  */
-async function getThemeparks(env: Env): Promise<Themepark[]>{
+async function getThemeparks(env: Env): Promise<ThemeparkAPI[]>{
     try{
         const db = getDbEnv(env);
-        const themeparks: Themepark[] = await db.select({
+        const themeparks: ThemeparkAPI[] = await db.select({
             apiName: themepark.apiName,
             id: themepark.id
         }).from(themepark);
@@ -74,13 +34,13 @@ async function getThemeparks(env: Env): Promise<Themepark[]>{
  * @param parks Object of themeparks to get attractions from
  * @returns Object of attractions
  */
-async function getAttractionsByParks(env: Env, parks: Themepark[]): Promise<AttractionType[]>{
+async function getAttractionsByParks(env: Env, parks: ThemeparkAPI[]): Promise<Attraction[]>{
     try{
         const db = getDbEnv(env);
 
         const parkIds: number[] = parks.map(p => p.id);
 
-        const attractions: AttractionType[] = await db.select({
+        const attractions: Attraction[] = await db.select({
             name: attraction.name,
             apiCode: attraction.apiCode,
             themeparkId: attraction.themeparkId
@@ -100,7 +60,7 @@ async function getAttractionsByParks(env: Env, parks: Themepark[]): Promise<Attr
  * @param env DB Connection
  * @param parks Object of the themeparks from which the attractions have to be imported
  */
-async function importAttractionsByParks(env: Env, parks: Themepark[]): Promise<void>{
+async function importAttractionsByParks(env: Env, parks: ThemeparkAPI[]): Promise<void>{
     try{
         const db = getDbEnv(env);
         
