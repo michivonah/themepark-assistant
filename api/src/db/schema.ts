@@ -1,5 +1,7 @@
-import { integer, text, sqliteTable } from "drizzle-orm/sqlite-core";
+import { integer, text, sqliteTable, sqliteView } from "drizzle-orm/sqlite-core";
+import { eq, sql } from "drizzle-orm";
 
+// Tables
 export const attraction = sqliteTable('attraction', {
     id: integer().primaryKey({ autoIncrement: true }),
     name: text().notNull(),
@@ -23,7 +25,7 @@ export const logbook = sqliteTable('logbook', {
     realWaittime: integer()
 })
 
-export const notificationMethod = sqliteTable('notification', {
+export const notificationMethod = sqliteTable('notification_method', {
     id: integer().primaryKey({ autoIncrement: true }),
     webhookUrl: text().notNull(),
     shownName: text().notNull(),
@@ -43,3 +45,23 @@ export const user = sqliteTable('user', {
     username: text().notNull(),
     isActive: integer({ mode: 'boolean' }).default(false)
 })
+
+// Views
+export const subscribedThemeparks = sqliteView('subscribed_themeparks').as((qb) =>
+    qb.selectDistinct({
+        apiName: sql<string>`themepark.api_name`.as('api_name')
+    }).from(attractionNotification)
+    .innerJoin(attraction, eq(attractionNotification.attractionId, attraction.id))
+    .innerJoin(themepark, eq(attraction.themeparkId, themepark.id))
+);
+
+export const attractionSubscriptions = sqliteView('attraction_subscriptions').as((qb) =>
+    qb.selectDistinct({
+        attractionApiCode: sql<string>`attraction.api_code`.as('attraction_api_code'),
+        themeparkApiName: sql<string>`themepark.api_name`.as('themepark_api_name'),
+        webhookUrl: sql<string>`notification_method.webhook_url`.as('webhook_url')
+    }).from(attractionNotification)
+    .innerJoin(attraction, eq(attractionNotification.attractionId, attraction.id))
+    .innerJoin(themepark, eq(attraction.themeparkId, themepark.id))
+    .innerJoin(notificationMethod, eq(attractionNotification.notificationMethodId, notificationMethod.id))
+);
