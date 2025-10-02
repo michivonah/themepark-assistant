@@ -43,3 +43,8 @@ Run curl request with cron expression
 ```bash
 curl "http://localhost:8787/__scheduled?cron=*+*+*+*+*"
 ```
+
+## Authentication endpoints
+- /auth/signin -> Login
+- /auth/signout -> Logout
+- /auth/callback/github -> Callback for GitHub OAuth config
