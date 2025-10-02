@@ -29,7 +29,13 @@ export const notificationMethod = sqliteTable('notification_method', {
     id: integer().primaryKey({ autoIncrement: true }),
     webhookUrl: text().notNull(),
     shownName: text().notNull(),
-    userId: integer().notNull().references(() => user.id)
+    userId: integer().notNull().references(() => user.id),
+    notificationProviderId: integer().notNull().references(() => notificationProvider.id),
+})
+
+export const notificationProvider = sqliteTable('notification_provider', {
+    id: integer().primaryKey({ autoIncrement: true }),
+    name: text().notNull().unique()
 })
 
 export const themepark = sqliteTable('themepark', {
@@ -59,9 +65,11 @@ export const attractionSubscriptions = sqliteView('attraction_subscriptions').as
     qb.selectDistinct({
         attractionApiCode: sql<string>`attraction.api_code`.as('attraction_api_code'),
         themeparkApiName: sql<string>`themepark.api_name`.as('themepark_api_name'),
-        webhookUrl: sql<string>`notification_method.webhook_url`.as('webhook_url')
+        webhookUrl: sql<string>`notification_method.webhook_url`.as('webhook_url'),
+        notificationProviderName: sql<string>`notification_provider.name`.as('notification_provider_name'),
     }).from(attractionNotification)
     .innerJoin(attraction, eq(attractionNotification.attractionId, attraction.id))
     .innerJoin(themepark, eq(attraction.themeparkId, themepark.id))
     .innerJoin(notificationMethod, eq(attractionNotification.notificationMethodId, notificationMethod.id))
+    .innerJoin(notificationProvider, eq(notificationMethod.notificationProviderId, notificationProvider.id))
 );

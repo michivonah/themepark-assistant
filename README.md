@@ -1,5 +1,5 @@
 # themepark-assistant
-A tool for improving your trips to themepark - once developed
+A tool for improving your trips to themeparks - once developed
 
 ## Testing
 Send request
@@ -14,6 +14,12 @@ DB scheme is defined in typescript
 apply changes
 ```bash
 npx drizzle-kit push --config=drizzle-dev.config.ts
+```
+
+## SQLite / D1
+Delete view
+```sql
+DROP VIEW IF EXISTS attraction_subscriptions;
 ```
 
 ## Cloudflare workers tricks

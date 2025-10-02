@@ -30,6 +30,13 @@
       "migrations_dir": "drizzle/migrations"
     }
   ],
+  "kv_namespaces": [
+    {
+      "binding": "waittime_cache",
+      "id": "496e1b5c3a1d4211b5f63315dd1423e3",
+      "preview_id": "1a44ab1983f04d9e90d035b6f11ccb09"
+    }
+  ],
   "triggers": {
     "crons": [
       "0 1-6 7,14,21,28 * *", // Each hour from 01:00 to 06:00 on day-of-month 7, 14, 21, and 28. -> update attraction list
