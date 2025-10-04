@@ -4,6 +4,7 @@ import { getUser } from './lib/user-auth'
 import GitHub from '@auth/core/providers/github'
 import notification from './routes/notification'
 import logbook from './routes/logbook'
+import themepark from './routes/themepark'
 import cronRouter from './jobs/cron'
 
 // create app
@@ -26,13 +27,14 @@ app.use('/*', verifyAuth())
 
 // example endpoint
 app.get('/protected', async (c) => {
-  const user = await getUser(c);
-  return c.json(user);
+    const user = await getUser(c);
+    return c.json(user);
 })
 
 // define routes & export app
 app.route('/notification', notification)
 app.route('/logbook', logbook)
+app.route('/themepark', themepark)
 export default {
     fetch: app.fetch,
     scheduled: cronRouter,

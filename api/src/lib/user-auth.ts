@@ -4,7 +4,7 @@ import { UserSelect } from "../types/user";
 import { user } from "../db/schema";
 import { like } from "drizzle-orm";
 import { DrizzleD1Database } from "drizzle-orm/d1";
-import { MissingMailError, UserInactiveError } from "../types/error";
+import { MissingMailError, UserInactiveError, DatabaseError } from "../types/error";
 
 /**
  * Returns the details of a user from the given context
@@ -27,7 +27,7 @@ export async function getUser(c: Context): Promise<UserSelect>{
 
     }
     catch(e){
-        throw new Error(`Database error: ${e}`);
+        throw new DatabaseError();
     }
 
     const dbResult = userData[0] ?? await createUser(db, mail);
@@ -57,7 +57,7 @@ async function createUser(db: DrizzleD1Database, userMail: string): Promise<User
 
     }
     catch(e){
-        throw new Error(`Database error: ${e}`);
+        throw new DatabaseError();
     }
 
     return userData[0];

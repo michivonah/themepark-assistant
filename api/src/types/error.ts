@@ -11,3 +11,9 @@ export class MissingMailError extends HTTPException{
         super(400, { message: 'Mail address is missing in authorizaton header.' })
     }
 }
+
+export class DatabaseError extends HTTPException{
+    constructor(){
+        super(500, { message: 'Internal Database Error' })
+    }
+}
