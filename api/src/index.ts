@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import { authHandler, initAuthConfig, verifyAuth } from '@hono/auth-js'
+import { getUser } from './lib/user-auth'
 import GitHub from '@auth/core/providers/github'
 import notification from './routes/notification'
 import logbook from './routes/logbook'
@@ -24,9 +25,9 @@ app.use('/auth/*', authHandler())
 app.use('/*', verifyAuth())
 
 // example endpoint
-app.get('/protected', (c) => {
-  const auth = c.get('authUser')
-  return c.json(auth)
+app.get('/protected', async (c) => {
+  const user = await getUser(c);
+  return c.json(user);
 })
 
 // define routes & export app

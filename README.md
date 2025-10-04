@@ -16,6 +16,11 @@ apply changes
 npx drizzle-kit push --config=drizzle-dev.config.ts
 ```
 
+export sql statements instead of running migration
+```bash
+npx drizzle-kit export --config=drizzle-dev.config.ts
+```
+
 ## SQLite / D1
 Delete view
 ```sql

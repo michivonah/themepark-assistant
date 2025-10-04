@@ -1,4 +1,4 @@
-import { integer, text, sqliteTable, sqliteView } from "drizzle-orm/sqlite-core";
+import { check, integer, text, sqliteTable, sqliteView } from "drizzle-orm/sqlite-core";
 import { eq, sql } from "drizzle-orm";
 
 // Tables
@@ -48,9 +48,15 @@ export const themepark = sqliteTable('themepark', {
 
 export const user = sqliteTable('user', {
     id: integer().primaryKey({ autoIncrement: true }),
-    username: text().notNull(),
-    isActive: integer({ mode: 'boolean' }).default(false)
-})
+    mail: text().notNull().unique(),
+    isActive: integer({ mode: 'boolean' }).notNull().default(false),
+    createdAt: integer().notNull(),
+    lastActive: integer().notNull()
+},
+(table) => [
+    check("mail_validation", sql`${table.mail} LIKE '%@%'`)
+]
+)
 
 // Views
 export const subscribedThemeparks = sqliteView('subscribed_themeparks').as((qb) =>
