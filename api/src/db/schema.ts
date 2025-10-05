@@ -1,37 +1,45 @@
-import { check, integer, text, sqliteTable, sqliteView } from "drizzle-orm/sqlite-core";
+import { check, integer, text, sqliteTable, sqliteView, unique } from "drizzle-orm/sqlite-core";
 import { eq, sql } from "drizzle-orm";
 
 // Tables
 export const attraction = sqliteTable('attraction', {
     id: integer().primaryKey({ autoIncrement: true }),
     name: text().notNull(),
-    apiCode: text().notNull().unique(),
-    themeparkId: integer().notNull().references(() => themepark.id)
-})
+    apiCode: text('api_code').notNull().unique(),
+    themeparkId: integer('themepark_id').notNull().references(() => themepark.id)
+}, (t) => [
+    unique().on(t.apiCode, t.themeparkId)
+])
 
 export const attractionNotification = sqliteTable('attraction_notification', {
     id: integer().primaryKey({ autoIncrement: true}),
-    userId: integer().notNull().references(() => user.id),
-    attractionId: integer().notNull().references(() => attraction.id),
-    notificationMethodId: integer().notNull().references(() => notificationMethod.id)
-})
+    userId: integer('user_id').notNull().references(() => user.id),
+    attractionId: integer('attraction_id').notNull().references(() => attraction.id),
+    notificationMethodId: integer('notification_method_id').notNull().references(() => notificationMethod.id)
+}, (t) => [
+    unique().on(t.userId, t.attractionId, t.notificationMethodId)
+])
 
 export const logbook = sqliteTable('logbook', {
     id: integer().primaryKey({ autoIncrement: true }),
-    userId: integer().notNull().references(() => user.id),
-    attractionId: integer().notNull().references(() => attraction.id),
+    userId: integer('user_id').notNull().references(() => user.id),
+    attractionId: integer('attraction_id').notNull().references(() => attraction.id),
     timestamp: integer().notNull(), // unix timecode
     expectedWaittime: integer(),
     realWaittime: integer()
-})
+}, (t) => [
+    unique().on(t.userId, t.attractionId, t.timestamp)
+])
 
 export const notificationMethod = sqliteTable('notification_method', {
     id: integer().primaryKey({ autoIncrement: true }),
-    webhookUrl: text().notNull(),
+    webhookUrl: text('webhook_url').notNull(),
     shownName: text().notNull(),
-    userId: integer().notNull().references(() => user.id),
-    notificationProviderId: integer().notNull().references(() => notificationProvider.id),
-})
+    userId: integer('user_id').notNull().references(() => user.id),
+    notificationProviderId: integer('notification_provider_id').notNull().references(() => notificationProvider.id),
+}, (t) => [
+    unique().on(t.webhookUrl, t.userId, t.notificationProviderId)
+])
 
 export const notificationProvider = sqliteTable('notification_provider', {
     id: integer().primaryKey({ autoIncrement: true }),
