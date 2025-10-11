@@ -1,26 +1,13 @@
 // Error classes for background jobs
+import { BaseError } from "./base-error";
 
 // Class for custom background errors
-export class BackgroundJobError extends Error{
-    cause?: unknown;
-
-    constructor(message: string, cause?: unknown){
-        super(message);
-        this.name = this.constructor.name;
-        this.cause = cause;
-    }
-}
+export class BackgroundJobError extends BaseError{}
 
 // Errors based on class BackgroundJobError
 export class BackgroundDatabaseError extends BackgroundJobError{
     constructor(cause?: unknown){
         super('Database request failed.', cause);
-    }
-}
-
-export class BackgroundFetchError extends BackgroundJobError{
-    constructor(cause?: unknown){
-        super('Fetching data failed', cause);
     }
 }
 
