@@ -1,5 +1,6 @@
 import { AttractionImport } from '../types/attraction'
 import httpRequest from '../lib/http-request'
+import { FetchError } from '../errors';
 
 /**
  * Fetching the attractions from a specified park
@@ -25,6 +26,6 @@ export default async function fetchAttractions(
         return result;
     }
     catch(e){
-        throw new Error(`Failed to fetch attractions: ${e}`);
+        throw new FetchError(e, endpoint);
     }
 }

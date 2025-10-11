@@ -1,3 +1,5 @@
+import { HTTPError } from "../errors";
+
 /**
  * Executes a HTTP Request with option for custom header & body parameters
  * @param endpoint Request endpoint
@@ -26,7 +28,7 @@ export default async function httpRequest<TResponse, TBody = undefined>(
 
 
     if (!response.ok){
-        throw new Error(`HTTP error! Status: ${response.status}`);
+        throw new HTTPError(response.status);
     }
 
     if(response.status === 204){

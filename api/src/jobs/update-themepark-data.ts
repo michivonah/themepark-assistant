@@ -1,7 +1,7 @@
 import { getDbEnv } from '../db/client'
 import { themepark } from '../db/schema'
 import { countryCodesDE } from '../lib/countries'
-import { BackgroundFetchError, ThemeparkUpdateError } from '../errors/background-error'
+import { FetchError, ThemeparkUpdateError } from '../errors'
 import httpRequest from '../lib/http-request'
 import asyncBatchJob from '../lib/async-batch-job'
 
@@ -31,7 +31,7 @@ async function fetchThemeparks(
         return result;
     }
     catch(e){
-        throw new BackgroundFetchError(e);
+        throw new FetchError(e);
     }
 }
 

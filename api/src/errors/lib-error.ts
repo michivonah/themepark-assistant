@@ -12,3 +12,15 @@ export class FetchError extends LibError{
             cause);
     }
 }
+
+export class BatchExecutionError extends LibError{
+    constructor(cause?: unknown){
+        super('Batched execution failed.', cause);
+    }
+}
+
+export class HTTPError extends LibError{
+    constructor(errorCode: number, cause?: unknown){
+        super(`Received HTTP error code: ${errorCode}`, cause);
+    }
+}

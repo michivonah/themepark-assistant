@@ -1,3 +1,5 @@
+import { BatchExecutionError } from "../errors";
+
 /**
  * Run any async operation in (multiple) batches
  * @param data Array to split into batches
@@ -12,6 +14,6 @@ export default async function asyncBatchJob<T>(data: T[], batchSize: number = 20
         }
     }
     catch(e){
-        throw new Error(`Batch execution failed: ${e}`);
+        throw new BatchExecutionError(e);
     }
 }

@@ -3,7 +3,7 @@ import { attraction, themepark } from '../db/schema'
 import { inArray } from 'drizzle-orm'
 import { Attraction } from '../types/attraction'
 import { ThemeparkSelect } from '../types/themepark'
-import { AttractionImportError, BackgroundDatabaseError } from '../errors/background-error'
+import { AttractionImportError, BackgroundDatabaseError } from '../errors'
 import asyncBatchJob from '../lib/async-batch-job'
 import fetchAttractions from '../lib/fetch-attractions'
 

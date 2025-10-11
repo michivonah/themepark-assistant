@@ -3,7 +3,7 @@ import { getDbEnv } from '../db/client'
 import { subscribedThemeparks, attractionSubscriptions } from "../db/schema";
 import { SubscribedThemeparks } from "../types/subscribed-themeparks";
 import { AttractionSubscription } from "../types/attraction-subscriptions";
-import { KVParseError, SendNotificationError } from "../errors/background-error";
+import { KVParseError, SendNotificationError } from "../errors";
 import httpRequest from "../lib/http-request";
 import fetchAttractions from "../lib/fetch-attractions";
 

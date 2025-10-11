@@ -3,7 +3,7 @@ import { getDbContext } from '../db/client'
 import { themepark, attraction } from '../db/schema'
 import { responseCache } from '../lib/cache'
 import { eq } from 'drizzle-orm'
-import { DatabaseError } from '../errors/http-error'
+import { DatabaseError } from '../errors'
 
 const app = new Hono()
 
