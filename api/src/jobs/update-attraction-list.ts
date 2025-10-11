@@ -3,6 +3,7 @@ import { attraction, themepark } from '../db/schema'
 import { inArray } from 'drizzle-orm'
 import { Attraction } from '../types/attraction'
 import { ThemeparkSelect } from '../types/themepark'
+import { AttractionImportError, BackgroundDatabaseError } from '../errors/background-error'
 import asyncBatchJob from '../lib/async-batch-job'
 import fetchAttractions from '../lib/fetch-attractions'
 
@@ -24,7 +25,7 @@ async function getThemeparks(env: Env): Promise<ThemeparkAPI[]>{
         return themeparks;
     }
     catch(e){
-        throw new Error(`Failed to get themeparks from database: ${e}`);
+        throw new BackgroundDatabaseError(e);
     }
 }
 
@@ -50,7 +51,7 @@ async function getAttractionsByParks(env: Env, parks: ThemeparkAPI[]): Promise<A
         return attractions;
     }
     catch(e){
-        throw new Error(`Failed to get attractions from database: ${e}`);
+        throw new BackgroundDatabaseError(e);
     }
 }
 
@@ -86,7 +87,7 @@ async function importAttractionsByParks(env: Env, parks: ThemeparkAPI[]): Promis
         }
     }
     catch(e){
-        throw new Error(`Failed to import attractions into database: ${e}`);
+        throw new AttractionImportError(e);
     }
 }
 
@@ -99,27 +100,22 @@ async function importAttractionsByParks(env: Env, parks: ThemeparkAPI[]): Promis
  * @param cron The cron statement specified to run the background jobs; used for batch size calculation
  */
 export async function batchAttractionImport(env: Env, timestamp: number, cron: string): Promise<void>{
-    try{
-        const themeparks = await getThemeparks(env); // all themeparks
-        const executionHour = new Date(timestamp).getUTCHours(); // current hour, in which job is executed
-        const executionTimes = getExecutionCountFromCron(cron, 1); // how often the job is executed
+    const themeparks = await getThemeparks(env); // all themeparks
+    const executionHour = new Date(timestamp).getUTCHours(); // current hour, in which job is executed
+    const executionTimes = getExecutionCountFromCron(cron, 1); // how often the job is executed
 
-        const batchSize = Math.ceil(themeparks.length / executionTimes); // calculate batch size, so that each park gets updated
-        const hourIndex = executionHour - 1;
+    const batchSize = Math.ceil(themeparks.length / executionTimes); // calculate batch size, so that each park gets updated
+    const hourIndex = executionHour - 1;
 
-        // time examples
-        // 01:00 -> 1757811600000
-        // 02:00 -> 1757815200000
-        // 03:00 -> 1757818800000
+    // time examples
+    // 01:00 -> 1757811600000
+    // 02:00 -> 1757815200000
+    // 03:00 -> 1757818800000
 
-        const batch = themeparks.slice(hourIndex * batchSize, (hourIndex + 1) * batchSize); // slice array into right batch
+    const batch = themeparks.slice(hourIndex * batchSize, (hourIndex + 1) * batchSize); // slice array into right batch
 
-        // import attractions from current time batch
-        await importAttractionsByParks(env, batch);
-    }
-    catch(e){
-        throw new Error(`Failed to split attraction import by time: ${e}`);
-    }
+    // import attractions from current time batch
+    await importAttractionsByParks(env, batch);
 }
 
 /**

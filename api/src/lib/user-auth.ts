@@ -4,7 +4,7 @@ import { UserSelect } from "../types/user";
 import { user } from "../db/schema";
 import { like } from "drizzle-orm";
 import { DrizzleD1Database } from "drizzle-orm/d1";
-import { MissingMailError, UserInactiveError, DatabaseError } from "../types/error";
+import { MissingMailError, UserInactiveError, DatabaseError } from "../errors/http-error";
 
 /**
  * Returns the details of a user from the given context

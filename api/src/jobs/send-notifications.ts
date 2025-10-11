@@ -3,6 +3,7 @@ import { getDbEnv } from '../db/client'
 import { subscribedThemeparks, attractionSubscriptions } from "../db/schema";
 import { SubscribedThemeparks } from "../types/subscribed-themeparks";
 import { AttractionSubscription } from "../types/attraction-subscriptions";
+import { KVParseError, SendNotificationError } from "../errors/background-error";
 import httpRequest from "../lib/http-request";
 import fetchAttractions from "../lib/fetch-attractions";
 
@@ -11,6 +12,7 @@ import fetchAttractions from "../lib/fetch-attractions";
  * waittime in cache & send notification about changes in waittime.
  * @param env Connection to Cloudflare
  */
+// TODO: split into batches by cron, when more than 10 parks have to be fetched -> like update-attraction-list.ts
 export default async function updateWaittimes(env: Env): Promise<void>{
     const db = getDbEnv(env);
     const subscribedParks = await db.select().from(subscribedThemeparks);
@@ -54,7 +56,7 @@ async function getJsonFromKV<T>(env: Env, key: string, defaultValue: T): Promise
         return JSON.parse(cache) as T;
     }
     catch(e){
-        throw new Error(`Failed to parse JSON from KV, affected key: ${key}, error: ${e}`);
+        throw new KVParseError(key, e);
     }
 }
 
@@ -131,7 +133,7 @@ async function sendNotification(webhookUrl: string, message: string, type: strin
         });
     }
     catch(e){
-        throw new Error(`Failed to send notification: ${e}`);
+        throw new SendNotificationError(e);
     }
 }
 

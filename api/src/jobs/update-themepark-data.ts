@@ -1,6 +1,7 @@
 import { getDbEnv } from '../db/client'
 import { themepark } from '../db/schema'
 import { countryCodesDE } from '../lib/countries'
+import { BackgroundFetchError, ThemeparkUpdateError } from '../errors/background-error'
 import httpRequest from '../lib/http-request'
 import asyncBatchJob from '../lib/async-batch-job'
 
@@ -30,7 +31,7 @@ async function fetchThemeparks(
         return result;
     }
     catch(e){
-        throw new Error(`Fetching themeparks failed: ${e}`);
+        throw new BackgroundFetchError(e);
     }
 }
 
@@ -67,6 +68,6 @@ export async function updateThemeparkData(env: Env): Promise<void>{
         }
     }
     catch(e){
-        console.error(`Failed to update themepark data: ${e}`);
+        throw new ThemeparkUpdateError(e);
     }
 }
