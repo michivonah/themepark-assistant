@@ -14,8 +14,12 @@ export class MissingMailError extends HTTPException{
 }
 
 export class MissingParameter extends HTTPException{
-    constructor(paramName: string){
-        super(400, { message: `Request parameter '${paramName}' missing` })
+    constructor(paramName?: string){
+        super(400, { message:
+            paramName
+            ? `Request parameter '${paramName}' missing`
+            : 'Request parameter missing'
+        })
     }
 }
 

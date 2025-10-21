@@ -3,7 +3,7 @@ import { authHandler, initAuthConfig, verifyAuth } from '@hono/auth-js'
 import { getUser } from './lib/user-auth'
 import GitHub from '@auth/core/providers/github'
 import attraction from './routes/attraction'
-import notification from './routes/notification'
+import notification from './routes/notification-method'
 import logbook from './routes/logbook'
 import themepark from './routes/themepark'
 import cronRouter from './jobs/cron'
@@ -34,7 +34,7 @@ app.get('/protected', async (c) => {
 
 // define routes & export app
 app.route('/attraction', attraction)
-app.route('/notification', notification)
+app.route('/notification-method', notification)
 app.route('/logbook', logbook)
 app.route('/themepark', themepark)
 export default {

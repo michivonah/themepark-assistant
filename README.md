@@ -1,6 +1,8 @@
 # themepark-assistant
 A tool for improving your trips to themeparks - once developed
 
+> HINT: The tool is currently under development. The API endpoints are subject to change at any time. Use with caution.
+
 ## Repo structure
 - /api: API implementation
     - ./: config files

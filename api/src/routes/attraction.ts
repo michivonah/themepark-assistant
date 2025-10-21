@@ -1,13 +1,11 @@
 import { Hono, Context } from 'hono'
 import { getDbContext } from '../db/client'
-import { attractionNotification, notificationMethod } from '../db/schema'
+import { attractionNotification } from '../db/schema'
 import { and, eq } from 'drizzle-orm'
 import { DatabaseError, InvalidParameter, MissingParameter } from '../errors'
 import { getUser } from '../lib/user-auth'
 import { Message } from '../types/response'
-import { NotificationMethodSelect } from '../types/notification-method'
-
-type NotificationMethodUser = Pick<NotificationMethodSelect, "userId">;
+import { getNotificationMethodOwner } from '../lib/check-notification-method-owner'
 
 const app = new Hono()
 
@@ -20,29 +18,6 @@ function getNotificationMethodId(c: Context): number | undefined{
     const str = c.req.query('notificationMethodId');
     if(!str) return undefined;
     return parseInt(str);
-}
-
-/**
- * Checks if a specified user is the owner of a notification method and returns the owner if valid
- * @param db DB connection (already defined as variable/const)
- * @param methodId notificationMethodId to check
- * @param userId User to check wheter it is the owner
- * @returns Object with the owners userId
- */
-async function getNotificationMethodOwner(db: ReturnType<typeof getDbContext>, methodId: number, userId: number): Promise<NotificationMethodUser>{
-    try{
-        const method = await db.select({
-            userId: notificationMethod.userId
-        }).from(notificationMethod)
-        .where(eq(notificationMethod.id, methodId)).get();
-        
-        if(!method || method.userId !== userId) throw new InvalidParameter('notificationMethodId');
-        else return method;
-    }
-    catch(e){
-        if(e instanceof InvalidParameter) throw e;
-        throw new DatabaseError();
-    }
 }
 
 /**

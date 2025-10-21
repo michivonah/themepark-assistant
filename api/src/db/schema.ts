@@ -43,7 +43,8 @@ export const notificationMethod = sqliteTable('notification_method', {
 
 export const notificationProvider = sqliteTable('notification_provider', {
     id: integer().primaryKey({ autoIncrement: true }),
-    name: text().notNull().unique()
+    name: text().notNull().unique(),
+    isActive: integer({ mode: 'boolean' }).notNull().default(false),
 })
 
 export const themepark = sqliteTable('themepark', {
