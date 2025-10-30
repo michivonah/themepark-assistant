@@ -24,8 +24,12 @@ export class MissingParameter extends HTTPException{
 }
 
 export class InvalidParameter extends HTTPException{
-    constructor(paramName: string){
-        super(400, { message: `Provided parameter '${paramName}' is invalid.` })
+    constructor(paramName?: string){
+        super(400, { message:
+            paramName
+            ? `Provided parameter '${paramName}' is invalid.`
+            : 'Provided invalid parameter.'
+        })
     }
 }
 
