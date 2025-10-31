@@ -28,7 +28,7 @@ export class InvalidParameter extends HTTPException{
         super(400, { message:
             paramName
             ? `Provided parameter '${paramName}' is invalid.`
-            : 'Provided invalid parameter.'
+            : 'Provided invalid request parameter(s) or some required parameter is missing.'
         })
     }
 }
