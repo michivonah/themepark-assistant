@@ -6,24 +6,24 @@ export const attraction = sqliteTable('attraction', {
     id: integer().primaryKey({ autoIncrement: true }),
     name: text().notNull(),
     apiCode: text('api_code').notNull().unique(),
-    themeparkId: integer('themepark_id').notNull().references(() => themepark.id)
+    themeparkId: integer('themepark_id').notNull().references(() => themepark.id, {onDelete: 'cascade'})
 }, (t) => [
     unique().on(t.apiCode, t.themeparkId)
 ])
 
 export const attractionNotification = sqliteTable('attraction_notification', {
     id: integer().primaryKey({ autoIncrement: true}),
-    userId: integer('user_id').notNull().references(() => user.id),
-    attractionId: integer('attraction_id').notNull().references(() => attraction.id),
-    notificationMethodId: integer('notification_method_id').notNull().references(() => notificationMethod.id)
+    userId: integer('user_id').notNull().references(() => user.id, {onDelete: 'cascade'}),
+    attractionId: integer('attraction_id').notNull().references(() => attraction.id, {onDelete: 'cascade'}),
+    notificationMethodId: integer('notification_method_id').notNull().references(() => notificationMethod.id, {onDelete: 'cascade'})
 }, (t) => [
     unique().on(t.userId, t.attractionId, t.notificationMethodId)
 ])
 
 export const logbook = sqliteTable('logbook', {
     id: integer().primaryKey({ autoIncrement: true }),
-    userId: integer('user_id').notNull().references(() => user.id),
-    attractionId: integer('attraction_id').notNull().references(() => attraction.id),
+    userId: integer('user_id').notNull().references(() => user.id, {onDelete: 'cascade'}),
+    attractionId: integer('attraction_id').notNull().references(() => attraction.id, {onDelete: 'cascade'}),
     timestamp: integer().notNull(), // unix timecode
     expectedWaittime: integer(),
     realWaittime: integer()
@@ -35,8 +35,8 @@ export const notificationMethod = sqliteTable('notification_method', {
     id: integer().primaryKey({ autoIncrement: true }),
     webhookUrl: text('webhook_url').notNull(),
     shownName: text().notNull(),
-    userId: integer('user_id').notNull().references(() => user.id),
-    notificationProviderId: integer('notification_provider_id').notNull().references(() => notificationProvider.id),
+    userId: integer('user_id').notNull().references(() => user.id, {onDelete: 'cascade'}),
+    notificationProviderId: integer('notification_provider_id').notNull().references(() => notificationProvider.id, {onDelete: 'cascade'}),
 }, (t) => [
     unique().on(t.webhookUrl, t.userId, t.notificationProviderId)
 ])

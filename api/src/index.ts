@@ -6,6 +6,7 @@ import attraction from './routes/attraction'
 import notification from './routes/notification-method'
 import logbook from './routes/logbook'
 import themepark from './routes/themepark'
+import user from './routes/user'
 import cronRouter from './jobs/cron'
 
 // create app
@@ -37,6 +38,7 @@ app.route('/attraction', attraction)
 app.route('/notification-method', notification)
 app.route('/logbook', logbook)
 app.route('/themepark', themepark)
+app.route('/user', user)
 export default {
     fetch: app.fetch,
     scheduled: cronRouter,
