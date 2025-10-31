@@ -1,4 +1,4 @@
-import { Hono, Context } from 'hono'
+import { Hono } from 'hono'
 import { getDbContext } from '../db/client'
 import { attractionNotification } from '../db/schema'
 import { and, eq } from 'drizzle-orm'
@@ -6,19 +6,14 @@ import { DatabaseError, InvalidParameter, MissingParameter } from '../errors'
 import { getUser } from '../lib/user-auth'
 import { Message } from '../types/response'
 import { getNotificationMethodOwner } from '../lib/check-notification-method-owner'
+import { httpZValidator, idValidator, notificationMethodIdValidator } from '../lib/http-z-validator'
+import * as z from 'zod'
 
 const app = new Hono()
 
-/**
- * Checks if request has notificationMethodId parameter
- * @param c Request context
- * @returns if available notificationMethodId, else undefined
- */
-function getNotificationMethodId(c: Context): number | undefined{
-    const str = c.req.query('notificationMethodId');
-    if(!str) return undefined;
-    return parseInt(str);
-}
+
+
+
 
 /**
  * Checks if drizzle db error has a message cause
@@ -37,13 +32,12 @@ function hasMessageCause(e: unknown): e is Error & { cause: { message: string }}
 /**
  * Subscribe to waittime notifications from a specified attraction
  */
-app.post('/:id/subscribe', async (c) => {
-    const attractionId = parseInt(c.req.param('id'));
+app.post('/:id/subscribe', idValidator, notificationMethodIdValidator, async (c) => {
+    const attractionId = c.req.valid('param').id;
     const db = getDbContext(c)
     const user = await getUser(c);
 
-    const notificationMethodId = getNotificationMethodId(c);
-    if(!notificationMethodId) throw new MissingParameter('notificationMethodId');
+    const notificationMethodId = c.req.valid('query').notificationMethodId;
 
     const method = await getNotificationMethodOwner(db, notificationMethodId, user.id);
 
@@ -73,12 +67,12 @@ app.post('/:id/subscribe', async (c) => {
 /**
  * Unsubscribe to waittime notifications from a specified attraction
  */
-app.post('/:id/unsubscribe', async (c) => {
-    const attractionId = parseInt(c.req.param('id'));
+app.post('/:id/unsubscribe', idValidator, notificationMethodIdValidator, async (c) => {
+    const attractionId = c.req.valid('param').id;
     const db = getDbContext(c)
     const user = await getUser(c);
 
-    const notificationMethodId = getNotificationMethodId(c);
+    const notificationMethodId = c.req.valid('query').notificationMethodId;
     const methodOwner = notificationMethodId ? await getNotificationMethodOwner(db, notificationMethodId, user.id): false;
 
     const queryConditions = [

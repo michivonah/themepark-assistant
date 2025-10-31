@@ -4,6 +4,7 @@ import { themepark, attraction } from '../db/schema'
 import { responseCache } from '../lib/cache'
 import { eq } from 'drizzle-orm'
 import { DatabaseError } from '../errors'
+import { idValidator } from '../lib/http-z-validator'
 
 const app = new Hono()
 
@@ -30,8 +31,8 @@ app.get('/list', responseCache, async (c) => {
 /**
  * Lists all attractions from a themepark with their id & name
  */
-app.get('/list/:id/attraction', responseCache, async (c) => {
-    const parkId = parseInt(c.req.param('id'));
+app.get('/list/:id/attraction', responseCache, idValidator, async (c) => {
+    const parkId = c.req.valid('param').id;
     const db = getDbContext(c)
 
     try{

@@ -5,6 +5,9 @@ import { eq, and } from 'drizzle-orm'
 import { getUser } from '../lib/user-auth'
 import { DatabaseError, InvalidParameter, MissingParameter } from '../errors'
 import { Message } from '../types/response'
+import { responseCache, dynamicCache } from '../lib/cache'
+import { httpZValidator, idValidator } from '../lib/http-z-validator'
+import * as z from 'zod'
 
 const app = new Hono()
 
@@ -51,7 +54,7 @@ app.get('/list', async (c) => {
 })
 
 /** Lists all available notification providers */
-app.get('/list-providers', async (c) => {
+app.get('/list-providers', responseCache, async (c) => {
   const db = getDbContext(c);
 
   try{
@@ -68,21 +71,24 @@ app.get('/list-providers', async (c) => {
 })
 
 /** Creates a new notification method from url, name & provider */
-app.post('/add-method', async (c) => {
+app.post('/add-method', httpZValidator('query', z.strictObject({
+  url: z.string(),
+  name: z.string(),
+  provider: z.string()
+})),
+async (c) => {
   const db = getDbContext(c);
   const user = await getUser(c);
 
-  const { url, name, provider } = c.req.query();
+  const params = c.req.valid('query');
 
-  if(!url || !name || !provider) throw new MissingParameter();
-
-  const providerId = await getProviderId(db, provider);
+  const providerId = await getProviderId(db, params.provider);
   if(!providerId) throw new InvalidParameter('provider');
 
   try{
     const newMethod = await db.insert(notificationMethod).values({
-      webhookUrl: url,
-      shownName: name,
+      webhookUrl: params.url,
+      shownName: params.name,
       userId: user.id,
       notificationProviderId: providerId
     }).returning().onConflictDoNothing().get();
@@ -103,12 +109,10 @@ app.post('/add-method', async (c) => {
 })
 
 /** Removes a existing notification method by id (has to be owned by the current user) */
-app.delete('/remove-method/:id', async (c) => {
+app.delete('/remove-method/:id', idValidator, async (c) => {
   const db = getDbContext(c);
   const user = await getUser(c);
-  const methodId = parseInt(c.req.param('id'));
-
-  if(!methodId) throw new InvalidParameter('id');
+  const methodId = c.req.valid('param').id;
 
   try{
     const res = await db.delete(notificationMethod).where(

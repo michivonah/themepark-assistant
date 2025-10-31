@@ -8,8 +8,23 @@ import { InvalidParameter } from '../errors'
  * @param schema Zod Validation scheme (docs: https://zod.dev/api)
  * @returns zValidator for running the validation
  */
-export default function httpZValidator<T extends z.ZodTypeAny>(type: 'query' | 'json' | 'param' = 'query', schema: T){
+export function httpZValidator<T extends z.ZodTypeAny>(type: 'query' | 'json' | 'param' = 'query', schema: T){
     return zValidator(type, schema, (result, c) => {
         if(!result.success) throw new InvalidParameter();
     })
 }
+
+// Predefined validators
+/**
+ * Validates if id is a number (using zod)
+ */
+export const idValidator = httpZValidator('param', z.strictObject({
+  id: z.coerce.number()
+}));
+
+/**
+ * Validates if notificationMethodId is number (using zod)
+ */
+export const notificationMethodIdValidator = httpZValidator('query', z.strictObject({
+  notificationMethodId: z.coerce.number()
+}));

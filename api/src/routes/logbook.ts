@@ -5,9 +5,8 @@ import { logbook } from '../db/schema'
 import { and, eq } from 'drizzle-orm'
 import { getUser } from '../lib/user-auth'
 import { Message } from '../types/response'
-
+import { httpZValidator } from '../lib/http-z-validator'
 import * as z from 'zod'
-import httpZValidator from '../lib/http-z-validator'
 
 const app = new Hono()
 
