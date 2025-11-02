@@ -43,3 +43,8 @@ export default {
     fetch: app.fetch,
     scheduled: cronRouter,
 }
+
+// for testing with vitest
+export {
+    app
+}
